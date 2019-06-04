@@ -1,0 +1,109 @@
+<style type="text/css">      
+.layui-table-cell {height: auto;line-height: 25px;}
+</style>
+<link rel="stylesheet"  href="/static/page.css">
+<div>
+  <span class="layui-breadcrumb">
+    <a href="{:url('Brand/index')}">商品-品牌</a>
+    <a><cite>列表</cite></a>
+  </span>
+
+  <div style="float:right">      
+     <a href="{:url('Brand/add')}"><button class="layui-btn">添加</button></a>      
+     <a href="{:url('Brand/index')}"><button class="layui-btn layui-btn-danger" href="/Brand/index">返回</button></a>  
+  </div>
+ <hr/>
+</div>
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<!-- 操作按钮 -->
+  <script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  </script>  
+
+<!-- 品牌名称+链接 -->
+<script type="text/html" id="brand_name">
+  <a href="{{d.brand_url}}" class="layui-table-link" target="_blank">{{ d.brand_name }}</a>
+</script>
+<!-- 品牌LOGO+链接 -->
+<script type="text/html" id="brand_logo">
+  <img src="http://uploads.1810.com/{{d.brand_logo}}"/>
+</script>
+<!-- 是否显示 -->
+<script type="text/html" id="is_show">
+  <input type="checkbox" name="is_show" brand_id="{{d.brand_id}}" value="{{d.is_show}}" lay-skin="switch" lay-text="是|否" lay-filter="showDemo" {{ d.is_show == 1 ? 'checked' : '' }}>
+</script>
+<script>
+  $(function(){
+layui.use('table', function(){
+  var table = layui.table
+ ,form = layui.form;
+  table.render({
+    elem: '#test'
+    ,url:"{:url('Brand/index')}"
+    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+    // 分页
+    ,limit:"<?php echo config('pageSize') ?>"
+    ,page:true
+    ,cols: [[
+       {type:'checkbox',width:50}
+      ,{field:'brand_id',width:50, title: 'ID'}
+      ,{field:'brand_name',  title: '品牌名称',templet: '#brand_name'}
+      ,{field:'brand_url',  title: '品牌网址'}
+      ,{field:'brand_logo',  title: '品牌logo',templet: '#brand_logo'}
+      ,{field:'brand_desc', title: '品牌介绍'}
+      ,{field:'is_show', title: '是否显示',templet: '#is_show', unresize: true}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo'}
+    ]]
+  });
+  //监听是否显示操作
+  form.on('switch(showDemo)', function(obj){
+    // console.log(obj.elem.brand_id);
+   var brand_id = (obj.othis.prev().attr('brand_id'));
+    if (brand_id) {
+
+        $.ajax({
+            url: "{:url('Brand/ajaxupd')}",
+            data:{brand_id:brand_id,value:this.value,key:this.name},
+            cache: false
+          }).done(function( html ) {
+              $("#results").append(html);    
+          });
+
+    }
+  });
+
+  //监听行工具事件
+  table.on('tool(test)',function(obj){
+    var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'del'){
+      layer.confirm('真的删除行么', function(index){
+
+        $.ajax({
+            url: "{:url('Brand/delete')}",
+            data: {brand_id:data.brand_id},
+            dataType:"json",
+          }).done(function( msg ) {
+              if (msg.code==0) {
+                  layer.msg(msg.msg);
+                  // obj.del();
+                  // 页面更新
+                  window.location.reload();
+                  layer.close(index);
+              }else{
+                 layer.msg(msg.msg);
+              }
+          });
+
+      });
+    } else if(obj.event === 'edit'){
+      var brand_id= data.brand_id;
+      location.href = "{:url('Brand/edit')}?id="+brand_id;
+    }
+  });
+
+});
+});
+</script>

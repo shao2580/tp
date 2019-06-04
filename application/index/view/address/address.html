@@ -1,0 +1,208 @@
+
+<!-- 头部 -->
+{include file="public/user_top"/}
+<!--End Header End--> 
+<div class="i_bg bg_color">
+    <!--Begin 用户中心 Begin -->
+	<div class="m_content">
+
+   		  <!-- 左侧 -->
+      {include file="public/user_left"/}
+
+        <!--右侧 -->
+	     <div class="m_right">         
+        <div class="mem_tit">收货地址</div>
+        {volist name='addressInfo' id='v'}
+        {if condition="$v['is_default'] eq 1"}
+			      <div class="address" style="border: 1px solid red;">
+              	<div class="a_close">
+                  <a href="javascript:;" ><img src="__STATIC__/index/images/a_close.png" class="del" address_id="{$v.address_id}" /></a></div>
+              	<table border="0" class="add_t" align="center" style="width:98%; margin:10px auto;" cellspacing="0" cellpadding="0">               
+                    <tr>
+                      <td align="right" width="80">收货人姓名：</td>
+                      <td>{$v.address_name}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">配送区域：</td>
+                      <td>{$v.province}{$v.city}{$v.area}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">详细地址：</td>
+                      <td>{$v.address_detail}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">电话：</td>
+                      <td>{$v.address_tel}</td>
+                    </tr>              
+                    <tr>
+                      <td align="right">邮编：</td>
+                      <td>{$v.address_mail}</td>
+                    </tr>     
+                  </table>
+                  <p align="right">
+                  	<a href="{:url('Address/addressUpdate')}?address_id={$v.address_id}" style="color:#ff4e00;">编辑</a>&nbsp; &nbsp; &nbsp; &nbsp; 
+                  </p>
+            </div>
+        {else/}
+            <div class="address">
+                <div class="a_close">
+                  <a href="javascript:;" ><img src="__STATIC__/index/images/a_close.png" class="del"  address_id="{$v.address_id}"/></a></div>
+                <table border="0" class="add_t" align="center" style="width:98%; margin:10px auto;" cellspacing="0" cellpadding="0">               
+                    <tr>
+                      <td align="right" width="80">收货人姓名：</td>
+                      <td>{$v.address_name}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">配送区域：</td>
+                      <td>{$v.province}{$v.city}{$v.area}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">详细地址：</td>
+                      <td>{$v.address_detail}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">电话：</td>
+                      <td>{$v.address_tel}</td>
+                    </tr>              
+                    <tr>
+                      <td align="right">邮编：</td>
+                      <td>{$v.address_mail}</td>
+                    </tr>     
+                  </table>
+                  <p align="right">
+                    <a href="{:url('Address/setAddressDefault')}?address_id={$v.address_id}"  style="color:#ff4e00;">设为默认</a>&nbsp; &nbsp; &nbsp; &nbsp; <a href="{:url('Address/addressUpdate')}?address_id={$v.address_id}" style="color:#ff4e00;">编辑</a>&nbsp; &nbsp; &nbsp; &nbsp; 
+                  </p>
+            </div>
+        {/if}    
+        {/volist}
+            <div class="mem_tit">
+            	<a href="#"><img src="__STATIC__/index/images/add_ad.gif"  /></a>
+            </div>
+            <table border="0" class="add_tab" style="width:930px;"  cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="135" align="right">配送地区</td>
+                <td colspan="3" style="font-family:'宋体';">
+                	
+                	<select class="add_ipt changearea" id="province">
+                      <option value="0" selected="selected">------请选择-----</option>
+                      {volist name="$provinceInfo" id='v'}
+                      <option value="{$v.id}">{$v.name}</option>
+                      {/volist}
+                    </select>
+                    <select class="add_ipt changearea"  id="city">
+                      <option value="0" selected="selected">-----请选择-----</option>
+                    </select>
+                    <select class="add_ipt changearea" id="area">
+                      <option value="0" selected="selected">-----请选择-----</option>
+                     
+                    </select>
+                    （必填）
+                </td>
+              </tr>
+              <tr>
+                <td align="right">收货人姓名</td>
+                <td style="font-family:'宋体';">
+                  <input type="text" placeholder="请填写收件人姓名"  class="add_ipt" id="address_name" />（必填）
+                </td>
+                <td align="right">电话</td>
+                <td style="font-family:'宋体';">
+                  <input type="text"  placeholder="请填写电话号码" class="add_ipt" id="address_tel" />（必填）
+                </td>
+              </tr>
+              <tr>
+                <td align="right">详细地址</td>
+                <td style="font-family:'宋体';">
+                  <input type="text" placeholder="请填写详细地址" class="add_ipt" id="address_detail" />（必填）
+                </td>
+                <td align="right">邮政编码</td>
+                <td style="font-family:'宋体';">
+                  <input type="text" placeholder="请填写邮政编码" class="add_ipt" id="address_mail" />
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <input type="checkbox" id="is_default">
+                  设置为默认收货地址
+                </td>
+              </tr>
+            </table>
+           	<p align="right">
+            	 <a href="javescript:;" class="add_b" id="add">确认添加</a>
+            </p>         
+        </div>
+    </div>
+
+    <script type="text/javascript">
+       $(function(){
+          //内容改变
+          $(document).on('change','.changearea',function(){
+            var _this=$(this); 
+             var _option="<option value='0' selected='selected'>-----请选择-----</option>";
+            _this.nextAll('select').html(_option);  
+            var id=_this.val();
+            $.post(
+                "{:url('Address/getArea')}",
+                {id:id},
+                function(res){
+                   
+                    for (var i in res) {
+                        _option+="<option value='"+res[i]['id']+"'>"+res[i]['name']+"</option>";
+                    }
+                    _this.next('select').html(_option);
+                },
+                'json'
+              );
+          })
+
+          // 点击确认添加
+          $('#add').click(function(){
+            var obj={};
+            obj.province=$('#province').val();
+            obj.city=$('#city').val();
+            obj.area=$('#area').val();
+            obj.address_name=$('#address_name').val();
+            obj.address_tel=$('#address_tel').val();
+            obj.address_mail=$('#address_mail').val();
+            obj.address_detail=$('#address_detail').val();
+            var is_default=$('#is_default').prop('checked');
+            if (is_default==true) {
+              obj.is_default=1;
+            }else{
+              obj.is_default=2;
+            }
+            //验证 ???
+           
+            // 传给控制器
+            $.post(
+                "{:url('Address/addressDo')}",
+                obj,
+                function(res){
+                  console.log(res);
+                }
+              );
+          })
+
+          // 点击 × 删除
+          $('.del').click(function(){
+              var _this = $(this);
+              var address_id = _this.attr('address_id');
+              // console.log(address_id);
+               // 把商品id传给控制器
+                $.post(
+                    "{:url('Address/del')}",
+                    {address_id:address_id},
+                    function(res){
+                      // console.log(res);
+                       if (res.code==1) {
+                            location.href="{:url('Address/address')}";   
+                        }
+                    },
+                    'json'
+                );         
+          })
+
+        
+
+       }) 
+
+    </script>

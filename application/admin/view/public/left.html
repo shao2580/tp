@@ -1,0 +1,89 @@
+ <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+
+       <?php 
+       $controller = request()->controller();
+          if(in_array($controller,['Goods','Category','Brand'])){
+       ?>
+
+        <li class="layui-nav-item layui-nav-itemed">
+          <?php
+            }else{
+          ?>
+        <dl class="layui-nav-item">
+         <?php } ?>
+
+          <a class="" href="javascript:;">商品管理</a>
+          <dl class="layui-nav-child">
+            <dd {if condition="$controller eq 'Goods' "} class='layui-this' {/if} ><a href="{:url('Goods/index')}">商品-管理</a></dd>
+            <dd {if condition="$controller eq 'Category' "} class='layui-this' {/if}  ><a href="{:url('Category/index')}">商品-分类</a></dd>
+            <dd {if condition="$controller eq 'Brand' "} class='layui-this' {/if} ><a href="{:url('Brand/index')}">商品-品牌</a></dd>   
+          </dl>
+        </dl>
+        </li>
+
+        <?php
+          if(in_array($controller,['Admin','Role','Menu'])){
+        ?>
+        <li class="layui-nav-item layui-nav-itemed">
+        <?php
+            }else{
+          ?>
+        <dl class="layui-nav-item">
+         <?php } ?> 
+          <a href="javascript:;">权限管理</a>
+          <dl class="layui-nav-child">
+            <dd {if condition="$controller eq 'Admin' "} class='layui-this' {/if} ><a href="{:url('Admin/index')}">管理员-管理 </a></dd>
+            <dd {if condition="$controller eq 'Role' "} class='layui-this' {/if}  ><a href="{:url('Role/index')}">角色-管理</a></dd>
+            <dd {if condition="$controller eq 'Menu' "} class='layui-this' {/if}  ><a href="{:url('Menu/index')}">菜单-管理</a></dd>
+            
+          </dl>
+        </dl>
+        </li>
+        <?php
+          if(in_array($controller,['add','index'])){
+        ?>
+        <li class="layui-nav-item layui-nav-itemed">
+        <?php
+            }else{
+          ?>
+        <dl class="layui-nav-item">
+         <?php } ?> 
+          <a href="javascript:;">友链管理</a>
+          <dl class="layui-nav-child">
+            <dd {if condition="$controller eq 'add' "} class='layui-this' {/if} ><a href="{:url('Friend/add')}">友链添加 </a></dd>
+            <dd {if condition="$controller eq 'index' "} class='layui-this' {/if}  ><a href="{:url('Friend/index')}">友链展示</a></dd> 
+          </dl>
+        </dl>
+        </li>
+         <?php if(in_array($controller,['newadd','Book'])){ ?>
+         <li class="layui-nav-item layui-nav-itemed">
+        <?php }else{ ?>
+        <dl class="layui-nav-item">
+         <?php } ?> 
+         <a href="javascript:;">测试—管理</a>
+         <dl class="layui-nav-child">
+           <dd {if condition="$controller eq 'Book' "} class='layui-this' {/if} ><a href="{:url('Book/index')}">图书管理 </a></dd>
+            <dd {if condition="$controller eq 'newadd' "} class='layui-this' {/if} ><a href="{:url('News/newadd')}">测试一 </a></dd>
+         </dl>
+        </li>
+        <!-- ****************** -->
+         </li>
+         <?php if(in_array($controller,['index','add'])){ ?>
+         <li class="layui-nav-item layui-nav-itemed">
+        <?php }else{ ?>
+        <dl class="layui-nav-item">
+         <?php } ?> 
+         <a href="javascript:;">活动—管理</a>
+         <dl class="layui-nav-child">
+           <dd {if condition="$controller eq 'index' "} class='layui-this' {/if} ><a href="{:url('Activity/index')}">一元抢购</a></dd>
+           <dd {if condition="$controller eq 'add' "} class='layui-this' {/if} ><a href="{:url('Activity/setting')}">设置商品活动</a></dd>
+            
+         </dl>
+        </li>
+        <li class="layui-nav-item"><a href="">发布商品</a></li>
+      </ul>
+    </div>
+  </div>

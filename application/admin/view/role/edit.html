@@ -1,0 +1,159 @@
+<div >
+  <span class="layui-breadcrumb">
+  <a href="{:url('Role/index')}">角色-管理</a>
+  <a><cite>添加</cite></a>
+</span>
+
+  <div style="float:right">
+     <a href="{:url('Role/index')}"><button class="layui-btn">列表</button></a>
+     <a href="{:url('Role/index')}"><button class="layui-btn layui-btn-danger" href="/Role/index">返回</button></a>
+  </div>
+</div>
+
+<!-- php错误提示语 -->
+<div >
+  <p style="color:red">{if condition="isset($error)"}{$error}{/if}</p>
+</div>
+<hr/>
+<!-- ---------------------------------------------------------- -->
+<form class="layui-form" action="{:url('Role/update',['id'=>$data.role_id])}" method="post">
+  <div class="layui-form-item">
+    <label  class="layui-form-label">角色名称:</label>
+    <div class="layui-input-inline">
+      <input type="text" name="role_name" value="{$data.role_name?$data.role_name:'';}" lay-verify="role_name" autocomplete="off" placeholder="请输入角色名称" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">角色描述:</label>
+      <div class="layui-input-inline">
+        <textarea name="role_ribe" id="role_ribe" rows="10" cols="30" value="">{$data.role_ribe?$data.role_ribe:'';}</textarea>
+      </div> 
+  </div>
+ 
+
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <input type="button"  class="layui-btn submitbtn" lay-submit="" lay-filter="demo1" value="立即提交">
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+  </div>
+</form>
+<!-- ----------------------------------------------------------- -->
+<script type="text/javascript">
+  <!-- 提交验证 -->
+  $('.submitbtn').click(function(){
+    // 标识
+    var role_name_flag = role_ribe_flag  = true;
+    // 验证名称
+    var role_names=$('input[name="role_name"]');
+    var role_name =role_names .val();
+        if (role_name=='') {
+          role_names.next().remove();
+          role_names.after('<i style="color:red">请输入角色名称</i>');
+          role_name_flag = false;
+      } 
+      var length = role_name.length;
+        if (length>10) {
+          role_names.next().remove();
+          role_names.after('<i style="color:red">角色名名称不能超过10个字符</i>');
+          role_name_flag = false;
+          
+        }
+
+    var reg =/^[\w\u4e00-\u9fa5-]{3,10}$/;
+        if (!reg.test(role_name)) {
+          role_names.next().remove();
+          role_names.after('<i style="color:red">角色名名称由3~10位汉字、字母、数字和下划线_及破折号-</i>');
+            role_name_flag = false;
+          }
+
+      if (role_name) {
+        $.ajax({
+          async:false,   // 要设置为同步（默认true）
+          method:"post",
+          url:"{:url('Role/checkOnlyName')}",
+          data:{name:role_name,role_id:{$data.role_id}}
+        }).done(function(data){
+          if (data!==0) {
+          role_names.next().remove();
+            role_names.after('<i style="color:red">角色名已存在</i>');
+          role_name_flag = false;
+         }
+        })
+      }    
+     
+     var role_ribes=$('#role_ribe');
+      var role_ribe =role_ribes.val();
+        if (role_ribe=='') {
+          role_ribes.next().remove();
+          role_ribes.after('<i style="color:red">请输入角色描述</i>');
+          role_ribe_flag= false;
+      }
+     // 判断所有输入正确--才能提交
+     if (role_name_flag && role_ribe_flag ) {
+      $('.layui-form').submit();
+     }   
+
+  });
+  /*--------------------------------------------------------------*/
+  //    js--验证管理员名称
+    $('input[name="role_name"]').blur(function(){
+      var role_name = $(this).val();
+      if (role_name=='') {
+        $(this).next().remove();
+        $(this).after('<i style="color:red">请输入角色名称</i>');
+        return;
+      }else{
+              // 验证管理员唯一性
+      $.post("{:url('Role/checkOnlyName')}", { name:role_name,role_id:{$data.role_id} },
+        function(data){
+               if (data!==0) {
+                
+                $('input[name="role_name"]').next().remove();
+                  $('input[name="role_name"]').after('<i style="color:red">角色名已存在</i>');
+                return;
+               }else{
+                $('input[name="role_name"]').next().remove();
+                  $('input[name="role_name"]').after('<i style="color:green">角色名可用</i>');
+               }
+       });
+      }
+
+      var length = admin_name.length;
+      if (length>10) {
+        $(this).next().remove();
+        $(this).after('<i style="color:red">角色名称不能超过10个字符</i>');
+        return;
+      }else{
+        $(this).next().remove();
+        $(this).after('<i style="color:green">角色名可用</i>');
+      }
+
+      var reg =/^[\w\u4e00-\u9fa5-]{3,10}$/;
+      if (!reg.test(role_name)) {
+        $(this).next().remove();
+        $(this).after('<i style="color:red">角色名称由3~10位汉字、字母、数字和下划线_及破折号-</i>');
+        return;
+      }else{
+          $(this).next().remove();
+          $(this).after('<i style="color:green">角色名可用</i>');
+      }
+
+    
+    });
+
+   $('#role_ribe').blur(function(){
+      var role_ribes = $(this).val();
+      
+      if (role_ribes=='') {
+    
+        $(this).next().remove();
+        $(this).after('<i style="color:red">请输入角色概述</i>');
+        return;
+      }else{
+         $(this).next().remove();
+        
+      }
+    });
+
+  </script>

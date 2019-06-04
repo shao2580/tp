@@ -1,0 +1,125 @@
+<style type="text/css">      
+.layui-table-cell {height:auto; width:auto; line-height: 25px;}
+</style>
+<link rel="stylesheet"  href="/static/page.css">
+<div>
+  <span class="layui-breadcrumb">
+    <a href="{:url('Activity/index')}">活动商品管理</a>
+    <a><cite>列表</cite></a>
+  </span>
+
+  <div style="float:right">      
+     <a href="{:url('Activity/add')}"><button class="layui-btn">添加</button></a>      
+     <a href="{:url('Activity/index')}"><button class="layui-btn layui-btn-danger" href="/Activity/index">返回</button></a>  
+  </div>
+ <hr/>
+</div>
+
+<table class="layui-hide" id="test" lay-filter="test">
+   <input type="button" class=" layui-btn layui-btn-primary" value="设为活动商品">
+</table>
+<!-- 操作按钮 -->
+  <script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="act">设为活动商品</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  </script>  
+
+<!-- 是否新品 -->
+<script type="text/html" id="is_new">
+  <span>{{ d.is_new == 1 ? '√' : '×' }}</span> 
+</script>
+<!-- 是否精品 -->
+<script type="text/html" id="is_best">
+  <span>{{ d.is_best == 1 ? '√' : '×' }}</span> 
+</script>
+<!-- 是否热销 -->
+<script type="text/html" id="is_hot">
+  <span>{{ d.is_hot == 1 ? '√' : '×' }}</span> 
+</script>
+<!-- 是否上架 -->
+<script type="text/html" id="is_on_sale">
+  <span>{{ d.is_on_sale == 1 ? '√' : '×' }}</span> 
+</script>
+
+<script>
+  $(function(){
+layui.use('table', function(){
+  var table = layui.table                  
+ ,form = layui.form;
+  table.render({
+    elem: '#test'
+    ,url:"{:url('Activity/index')}"
+    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+    // 分页
+    ,limit:"<?php echo config('pageSize') ?>"
+    ,page:true
+
+    ,cols: [[
+       {type:'checkbox',width:50}
+      ,{field:'goods_id',width:35, title: 'ID'}
+      ,{field:'goods_name',  title: '商品名称'}
+      ,{field:'shop_price',  title: '本店售价'}
+      ,{field:'goods_number',  title: '库存'}
+      ,{field:'is_new',  title: '新品',templet: '#is_new',}
+      ,{field:'is_best', title: '精品',templet: '#is_best',}
+      ,{field:'is_hot', title: '热销',templet: '#is_hot',}
+      ,{field:'is_on_sale', title: '上下架',templet: '#is_on_sale',}
+      ,{fixed:'right', width:150, title:'操作', toolbar: '#barDemo'}
+    ]]
+  });
+
+    // // 设为活动商品
+    // $('.act').click(function(){
+    //     table.on('tool(text)',function(obj){
+    //         $.ajax({
+    //           url:"{:url('Activity/setting')}",
+    //           data:{goods_id:data.goods_id},           
+    //         }).done(function(res){
+    //             console.log(res)
+    //         })
+
+    //     })
+    // })
+
+    //监听行工具事件
+    table.on('tool(test)',function(obj){
+      var data = obj.data;
+      //console.log(obj)
+      if(obj.event === 'del'){
+        layer.confirm('真的删除行么', function(index){
+
+          $.ajax({
+              url: "{:url('Activity/delete')}",
+              data: {Goods_id:data.Goods_id},
+              dataType:"json",
+            }).done(function( msg ) {
+                if (msg.code==0) {
+                    layer.msg(msg.msg);
+                    // obj.del();
+                    // 页面更新
+                    window.location.reload();
+                    layer.close(index);
+                }else{
+                   layer.msg(msg.msg);
+                }
+            });
+
+        });
+      } else if(obj.event === 'edit'){
+        var goods_id= data.Goods_id;
+        location.href = "{:url('Activity/edit')}?id="+goods_id;
+      }else if(obj.event === 'act'){
+         $.ajax({
+              url: "{:url('Activity/setting')}",
+              data: {goods_id:data.goods_id},
+          }).done(function(res){
+              console.log(res);
+          })
+      }
+
+    });
+
+});
+});
+</script>

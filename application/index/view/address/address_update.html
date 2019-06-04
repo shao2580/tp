@@ -1,0 +1,138 @@
+
+<!-- 头部 -->
+{include file="public/user_top"/}
+<!--End Header End--> 
+<div class="i_bg bg_color">
+    <!--Begin 用户中心 Begin -->
+	<div class="m_content">
+
+   		  <!-- 左侧 -->
+      {include file="public/user_left"/}
+
+        <!--右侧 -->
+	     <div class="m_right">         
+        <div class="mem_tit">修改地址</div>
+       
+            <!-- <div class="mem_tit">
+            	<a href="#"><img src="__STATIC__/index/images/add_ad.gif"  /></a>
+            </div> -->
+            <table border="0" class="add_tab" style="width:930px;"  cellspacing="0" cellpadding="0">
+              <input type="hidden" id="address_id" value="{$addressInfo.address_id}">
+              <tr>
+                <td width="135" align="right">配送地区</td>
+                <td colspan="3" style="font-family:'宋体';">
+                	
+                	<select class="add_ipt changearea" id="province">
+                      <option value="0" selected="selected">------请选择-----</option>
+                      {volist name='provinceInfo' id='v'}
+                      <option  value="{$v.id}" {if condition="$addressInfo['province'] eq $v['id']"} selected {/if}>{$v.name}</option>
+                      {/volist}
+                    </select>
+                    <select class="add_ipt changearea"  id="city">
+                      <option value="0" selected="selected">-----请选择-----</option>
+                      {volist name='cityInfo' id='v'}
+                      <option  value="{$v.id}" {if condition="$addressInfo['city'] eq $v['id']"} selected {/if} >{$v.name}</option>
+                      {/volist}
+                    </select>
+                    <select class="add_ipt changearea" id="area">
+                      <option value="0" selected="selected">-----请选择-----</option>
+                     {volist name='areaInfo' id='v'}
+                      <option  value="{$v.id}" {if condition="$addressInfo['area'] eq $v['id']"} selected {/if} >{$v.name}</option>
+                      {/volist}
+                    </select>
+                    （必填）
+                </td>
+              </tr>
+              <tr>
+                <td align="right">收货人姓名</td>
+                <td style="font-family:'宋体';">
+                  <input type="text" placeholder="请填写收件人姓名" value="{$addressInfo.address_name}" class="add_ipt" id="address_name" />（必填）
+                </td>
+                <td align="right">电话</td>
+                <td style="font-family:'宋体';">
+                  <input type="text"  placeholder="请填写电话号码" value="{$addressInfo.address_tel}" class="add_ipt" id="address_tel" />（必填）
+                </td>
+              </tr>
+              <tr>
+                <td align="right">详细地址</td>
+                <td style="font-family:'宋体';">
+                  <input type="text" placeholder="请填写详细地址" class="add_ipt" value="{$addressInfo.address_detail}" id="address_detail" />（必填）
+                </td>
+                <td align="right">邮政编码</td>
+                <td style="font-family:'宋体';">
+                  <input type="text" placeholder="请填写邮政编码" value="{$addressInfo.address_mail}" class="add_ipt" id="address_mail" />
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <input type="checkbox" id="is_default" {if condition="$addressInfo['is_default'] eq 1"} checked {/if} / >
+                  设置为默认收货地址
+                </td>
+              </tr>
+            </table>
+           	<p align="right">
+            	 <a href="javascript:;" class="add_b" id="update">确认修改</a>
+            </p>         
+        </div>
+    </div>
+
+    <script type="text/javascript">
+       $(function(){
+          //内容改变
+          $(document).on('change','.changearea',function(){
+            var _this=$(this); 
+             var _option="<option value='0' selected='selected'>-----请选择-----</option>";
+            _this.nextAll('select').html(_option);  
+            var id=_this.val();
+            $.post(
+                "{:url('Address/getArea')}",
+                {id:id},
+                function(res){
+                   
+                    for (var i in res) {
+                        _option+="<option value='"+res[i]['id']+"'>"+res[i]['name']+"</option>";
+                    }
+                    _this.next('select').html(_option);
+                },
+                'json'
+              );
+          })
+
+          // 点击确认修改
+          $('#update').click(function(){
+            var obj={};
+            obj.province=$('#province').val();
+            obj.city=$('#city').val();
+            obj.area=$('#area').val();
+            obj.address_name=$('#address_name').val();
+            obj.address_tel=$('#address_tel').val();
+            obj.address_mail=$('#address_mail').val();
+            obj.address_detail=$('#address_detail').val();
+            obj.address_id=$('#address_id').val();
+            var is_default=$('#is_default').prop('checked');
+            if (is_default==true) {
+              obj.is_default=1;
+            }else{
+              obj.is_default=2;
+            }
+            //验证 ???
+             // console.log(obj);exit;
+            // 传给控制器
+            $.post(
+                "{:url('Address/addressUpdateDo')}",
+                obj,
+                function(res){
+                  // console.log(res);
+                  if (res.code==1) {
+                       location.href="{:url('Address/address')}";   
+                    }
+                },
+                'json'
+              );
+          })
+
+        
+
+       }) 
+
+    </script>

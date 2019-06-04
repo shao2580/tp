@@ -1,0 +1,203 @@
+<div >
+  <span class="layui-breadcrumb">
+  <a href="{:url('Friend/index')}">友链管理</a>
+  <a><cite>添加</cite></a>
+</span>
+
+	<div style="float:right">
+	   <a href="{:url('Friend/index')}"><button class="layui-btn">列表</button></a>
+	   <a href="{:url('Friend/index')}"><button class="layui-btn layui-btn-danger" href="/Friend/index">返回</button></a>
+	</div>
+</div>
+
+<!-- php错误提示语 -->
+<div >
+
+	<p style="color:red">{if condition="isset($error)"}{$error}{/if}</p>
+</div>
+<hr/>
+<!-- ---------------------------------------------------------- -->
+<form class="layui-form" action="{:url('Friend/doadd')}" method="post">
+  <div class="layui-form-item">
+    <label  class="layui-form-label">友链名称:</label>
+    <div class="layui-input-inline">
+      <input type="text" name="name" lay-verify="required" value="" lay-verify="name|FriendName" autocomplete="off" placeholder="请输入友链名称" class="layui-input"><span></span>
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">友链网址:</label>
+      <div class="layui-input-inline">
+        <input type="text" name="url" lay-verify="required" value="" lay-verify="url|FriendUrl" autocomplete="off" placeholder="请输入友链网址" class="layui-input">
+      </div> 
+  </div>
+   <div class="layui-form-item">
+        <label class="layui-form-label">LOGO:</label>
+       <div class="layui-upload">
+        <input type="hidden" id="logo" name="logo" lay-verify="" value="" />
+          <button type="button" class="layui-btn" id="test1">点击上传图片</button>
+          <div class="layui-upload-list">
+            <img class="layui-upload-img" id="demo1">
+            <p id="demoText"></p>
+        </div>
+    </div>  
+  </div>  
+   
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <input type="button"  class="layui-btn submitbtn" lay-submit="" lay-filter="*" value="立即提交">
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+  </div>
+</form>
+<!-- ----------------------------------------------------------- -->
+<script>
+layui.use(['form', 'upload'], function(){
+  var $ = layui.jquery
+  ,upload = layui.upload
+  ,form = layui.form;
+  
+  //普通图片上传
+  var uploadInst = upload.render({
+    elem: '#test1'
+    ,url: "{:url('Friend/upload')}"
+    ,before: function(obj){
+      //预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#demo1').attr('src', result); //图片链接（base64）
+      });
+    }
+    ,done: function(res){
+      //如果上传失败
+      if(res.code > 0){
+        return layer.msg('上传失败');
+      }
+      //上传成功
+      
+      $('#logo').val(res.data.src);
+      layer.msg('上传成功');
+    }
+    ,error: function(){
+      //演示失败状态，并实现重传
+      var demoText = $('#demoText');
+      demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+      demoText.find('.demo-reload').on('click', function(){
+        uploadInst.upload();
+      });
+    }
+  });
+   form.on('submit(*)', function(data){
+   
+      console.log(data.field) 
+      $('form').submit();
+    });
+});
+
+/*********************************/
+<!-- 提交验证 -->
+  $('.submitbtn').click(function(){
+    // 标识
+    var name_flag = url_flag  = true;
+    // 验证名称
+    var names=$('input[name="name"]');
+    var name =names .val();
+        if (admin_name=='') {
+          names.next().remove();
+          names.after('<i style="color:red">请输入友链名称</i>');
+          name_flag = false;
+      } 
+     var urls=$('input[name="url"]');
+    var url =urls.val();
+        if (url=='') {
+          urls.next().remove();
+          urls.after('<i style="color:red">请输入友链url网址</i>');
+          name_flag = false;
+      } 
+      
+      if (name) {
+        $.ajax({
+          async:false,   // 要设置为同步（默认true）
+          method:"post",
+          url:"{:url('Friend/checkOnlyName')}",
+          data:{name:name}
+        }).done(function(data){
+          if (data!==0) {
+          names.next().remove();
+            names.after('<i style="color:red">友链名已存在</i>');
+          name_flag = false;
+         }
+        })
+      }    
+ 
+      // 验证url
+      var urls=$('input[name="url"]');     
+          var url = urls.val();
+          if (url=='') {
+            urls.next().remove();
+            urls.after('<i style="color:red">请输入url网址</i>');
+            url_flag = false;
+          }
+         var  reg = /((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
+          if (!reg.test(urls)){
+          $(urls).next().remove();
+          $(urls).after('<i style="color:red">url网址格式不正确</i>');
+          url_flag = false;
+        }
+
+       // 判断所有输入正确--才能提交
+     if (name_flag && url_flag ) {
+      $('.layui-form').submit();
+     } 
+    
+        
+  });
+  /*--------------------------------------------------------------*/
+  
+    $('input[name="name"]').blur(function(){
+        var name = $(this).val();
+        if (name=='') {
+          $(this).next().remove();
+          $(this).after('<i style="color:red">请输入友链名称</i>');
+          return;
+        }else{
+          $(this).next().remove();
+        }
+      
+        var reg =/^[\w\u4e00-\u9fa5-]{3,10}$/;
+        if (!reg.test(name)) {
+          $(this).next().remove();
+          $(this).after('<i style="color:red">友链名由3~10位汉字、字母、数字和下划线_及破折号-</i>');
+          return;
+        }else{
+          $(this).next().remove();
+        }
+
+      // 验证友链名唯一性
+        $.post("{:url('Friend/checkOnlyName')}", { name:name},
+          function(data){
+           if (data!==0) {
+            $('input[name="name"]').next().remove();
+              $('input[name="name"]').after('<i style="color:red">友链名已存在</i>');
+            return;
+           }
+        });      
+    });
+    // 验证网址
+     $('input[name="url"]').blur(function(){
+          var url = $(this).val();
+          if (url=='') {
+            $(this).next().remove();
+            $(this).after('<i style="color:red">请输入url网址</i>');
+            return;
+          }
+         var  reg = /((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
+          if (!reg.test(url)){
+          $(this).next().remove();
+          $(this).after('<i style="color:red">url网址格式不正确</i>');
+          return;
+        }else{
+          $(this).next().remove();
+        }
+
+     }) 
+  
+</script>

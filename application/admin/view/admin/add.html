@@ -1,0 +1,264 @@
+<div >
+  <span class="layui-breadcrumb">
+  <a href="{:url('Admin/index')}">管理员-管理</a>
+  <a><cite>添加</cite></a>
+</span>
+
+	<div style="float:right">
+	   <a href="{:url('Admin/index')}"><button class="layui-btn">列表</button></a>
+	   <a href="{:url('Admin/index')}"><button class="layui-btn layui-btn-danger" href="/admin/index">返回</button></a>
+	</div>
+</div>
+
+<!-- php错误提示语 -->
+<div >
+	<p style="color:red">{if condition="isset($error)"}{$error}{/if}</p>
+</div>
+<hr/>
+<!-- ---------------------------------------------------------- -->
+<form class="layui-form" action="{:url('Admin/doadd')}" method="post">
+  <div class="layui-form-item">
+    <label  class="layui-form-label">管理员名称:</label>
+    <div class="layui-input-inline">
+      <input type="text" name="admin_name" value="{$data.admin_name?$data.admin_name:'';}" lay-verify="admin_name" autocomplete="off" placeholder="请输入管理员名称" class="layui-input"><span></span>
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">邮箱:</label>
+      <div class="layui-input-inline">
+        <input type="email" name="email" value="{$data.email?$data.email:'';}" lay-verify="email" autocomplete="off" placeholder="请输入邮箱" class="layui-input">
+      </div> 
+  </div>
+ <div class="layui-form-item">
+    <label class="layui-form-label">密码:</label>
+    <div class="layui-input-inline">
+      <input type="password" name="pwd" value="{$data.pwd?$data.pwd:'';}" lay-verify="pwd" placeholder="请输入密码" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">确认密码:</label>
+    <div class="layui-input-inline">
+      <input type="password" name="repwd" value="{$data.repwd?$data.repwd:'';}" lay-verify="repwd" placeholder="请确认密码" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <input type="button"  class="layui-btn submitbtn" lay-submit="" lay-filter="demo1" value="立即提交">
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+  </div>
+</form>
+<!-- ----------------------------------------------------------- -->
+<script type="text/javascript">
+	<!-- 提交验证 -->
+	$('.submitbtn').click(function(){
+		// 标识
+		var admin_name_flag = email_flag = pwd_flag = repwd_flag = true;
+		// 验证名称
+		var admin_names=$('input[name="admin_name"]');
+		var admin_name =admin_names .val();
+		    if (admin_name=='') {
+		     	admin_names.next().remove();
+		     	admin_names.after('<i style="color:red">请输入管理员名称</i>');
+		     	admin_name_flag = false;
+			} 
+	    var length = admin_name.length;
+		   	if (length>10) {
+		   		admin_names.next().remove();
+		   		admin_names.after('<i style="color:red">管理员名称不能超过10个字符</i>');
+		   		admin_name_flag = false;
+		   	  
+		   	}
+		var reg =/^[\w\u4e00-\u9fa5-]{3,10}$/;
+		    if (!reg.test(admin_name)) {
+		     	admin_names.next().remove();
+		     	admin_names.after('<i style="color:red">管理员名称由3~10位汉字、字母、数字和下划线_及破折号-</i>');
+		      	admin_name_flag = false;
+	        }
+
+	    if (admin_name) {
+	    	$.ajax({
+		    	async:false,   // 要设置为同步（默认true）
+		    	method:"post",
+		    	url:"{:url('Admin/checkOnlyName')}",
+		    	data:{name:admin_name}
+	    	}).done(function(data){
+	    		if (data!==0) {
+     		 	admin_names.next().remove();
+      			admin_names.after('<i style="color:red">用户名已存在</i>');
+     		 	admin_name_flag = false;
+     		 }
+	    	})
+	    	
+	    	
+	    }    
+	        
+
+	    
+	    // 验证邮箱
+	    var emails=$('input[name="email"]');
+	    var email = emails.val();
+		    if (email=='') {
+		      	emails.next().remove();
+		      	emails.after('<i style="color:red">请输入邮箱</i>');
+		      	email_flag = false;
+		    }
+		var reg=/^[A-Za-z0-9\.|-|_]*[@]{1}[A-Za-z0-9\.|-|_]*[.]{1}[a-z]{2,5}$/;
+		    if (!reg.test(email)) {
+		      	emails.next().remove();
+		      	emails.after('<i style="color:red">邮箱格式不正确</i>');
+		      	email_flag = false;
+		    }
+
+		// 验证密码
+		var pwds=$('input[name="pwd"]');
+		var pwd = pwds.val();
+		    if (pwd=='') {
+		      pwds.next().remove();
+		      pwds.after('<i style="color:red">请输入密码</i>');
+		      pwd_flag = false;
+		    }
+		var length = pwd.length;
+		    if (length<6 || length>18) {
+		      	pwds.next().remove();
+		      	pwds.after('<i style="color:red">密码为6~18位字符</i>');
+		      	pwd_flag = false;
+		    }
+
+		// 验证确认密码
+		var repwds=$('input[name="repwd"]');
+		var repwd = repwds.val();
+		    if (repwd=='') {
+		      	repwds.next().remove();
+		      	repwds.after('<i style="color:red">请输入确认密码</i>');
+		      	repwd_flag = false;
+		    } 
+		if (repwd!==$('input[name="pwd"]').val()  ){ 
+		        repwds.next().remove();
+		      	repwds.after('<i style="color:red">两次密码不一致</i>');
+		      	repwd_flag = false;
+		    }  
+		// 判断所有输入正确--才能提交
+		 if (admin_name_flag && email_flag && pwd_flag && repwd_flag) {
+		 	$('.layui-form').submit();
+		 } 
+
+	});
+	/*--------------------------------------------------------------*/
+	//    js--验证管理员名称
+    $('input[name="admin_name"]').blur(function(){
+      var admin_name = $(this).val();
+      if (admin_name=='') {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">请输入管理员名称</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">用户名可用</i>');
+      }
+
+      var length = admin_name.length;
+      if (length>10) {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">管理员名称不能超过10个字符</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">用户名可用</i>');
+      }
+
+      var reg =/^[\w\u4e00-\u9fa5-]{3,10}$/;
+      if (!reg.test(admin_name)) {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">管理员名称由3~10位汉字、字母、数字和下划线_及破折号-</i>');
+      	return;
+      }else{
+      		$(this).next().remove();
+      		$(this).after('<i style="color:green">用户名可用</i>');
+      }
+
+    // 验证管理员唯一性
+      $.post("{:url('Admin/checkOnlyName')}", { name:admin_name},
+    		function(data){
+     		 if (data!==0) {
+     		 	$('input[name="admin_name"]').next().remove();
+      			$('input[name="admin_name"]').after('<i style="color:red">用户名已存在</i>');
+     		 	return;
+     		 }else{
+     		 	$('input[name="admin_name"]').next().remove();
+		      	$('input[name="admin_name"]').after('<i style="color:green">用户名可用</i>');
+     		 }
+		});
+    });
+
+    // 验证邮箱
+    $('input[name="email"]').blur(function(){
+      var email = $(this).val();
+      if (email=='') {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">请输入邮箱</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">邮箱可用</i>');
+      }
+  
+      var reg=/^[A-Za-z0-9\.|-|_]*[@]{1}[A-Za-z0-9\.|-|_]*[.]{1}[a-z]{2,5}$/;
+      if (!reg.test(email)) {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">邮箱格式不正确</i>');
+      	return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">邮箱可用</i>');
+      }
+    });
+
+    // 验证密码
+     $('input[name="pwd"]').blur(function(){
+      var pwd = $(this).val();
+      if (pwd=='') {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">请输入密码</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">密码可用</i>');
+      }
+
+      var length = pwd.length;
+      if (length<6 || length>18) {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">密码为6~18位字符</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">密码可用</i>');
+      }
+
+    });
+
+     // 验证确认密码
+      $('input[name="repwd"]').blur(function(){
+      var repwd = $(this).val();
+      if (repwd=='') {
+      	$(this).next().remove();
+      	$(this).after('<i style="color:red">请输入确认密码</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">密码可用</i>');
+      }
+      // 验证密码是否一致 
+      if (repwd!==$('input[name="pwd"]').val()){ 
+        $(this).next().remove();
+      	$(this).after('<i style="color:red">两次密码不一致</i>');
+        return;
+      }else{
+      	$(this).next().remove();
+      	$(this).after('<i style="color:green">密码可用</i>');
+      }
+    });
+
+  </script>

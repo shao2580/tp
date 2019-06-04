@@ -1,0 +1,29 @@
+     <div cate_id="{$floorInfo['topCate']['cate_id']}">        
+            <!--Begin 进口 生鲜 Begin-->
+            <div class="i_t mar_10">
+                <span class="floor_num"><font class="floor">{$floorInfo.floorNum}</font>F</span>
+
+                <span class="fl">{$floorInfo.topCate.cate_name}</span> 
+
+                {volist name="floorInfo['sonCate']" id='v'}               
+                <span class="i_mores fr"><a href="#">{$v.cate_name}</a>&nbsp; &nbsp; &nbsp; </span>
+                {/volist}
+            </div>
+            <div class="content">
+
+                <div class="fresh_mid">
+                    <ul>
+                        {volist name="floorInfo['goodsInfo']" id='v'}
+                        <li>
+                            <div class="name"><a href="#">{$v.goods_name}</a></div>
+                            <div class="price">
+                                <font>￥<span>{$v.shop_price}</span></font> &nbsp; 26R
+                            </div>
+                            <div class="img"><a href="#"><img src="__UPLOADS__/{$v.goods_img}" width="185" height="155" /></a></div>
+                        </li> 
+                        {/volist}                                                                            
+                    </ul>
+                </div>
+            </div>
+            <br/> 
+    </div>

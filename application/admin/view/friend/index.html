@@ -1,0 +1,83 @@
+<style type="text/css">      
+.layui-table-cell {height: auto; line-height: 25px;}
+</style>
+<link rel="stylesheet"  href="/static/page.css">
+<div>
+  <span class="layui-breadcrumb">
+    <a href="{:url('Friend/index')}">友链管理</a>
+    <a><cite>列表</cite></a>
+  </span>
+
+  <div style="float:right">      
+     <a href="{:url('Friend/add')}"><button class="layui-btn">添加</button></a>      
+     <a href="{:url('Friend/index')}"><button class="layui-btn layui-btn-danger" href="/Friend/index">返回</button></a>  
+  </div>
+ <hr/>
+</div>
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<!-- 操作按钮 -->
+  <script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  </script>  
+
+
+<!-- 品牌LOGO+链接 -->
+<script type="text/html" id="Friend_logo">
+  <img src="http://uploads.1810.com/{{d.logo}}"/>
+</script>
+
+
+<script>
+  $(function(){
+layui.use('table', function(){
+  var table = layui.table
+ ,form = layui.form;
+  table.render({
+    elem: '#test'
+    ,url:"{:url('Friend/index')}"
+    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+    ,cols: [[
+      ,{field:'id', title: 'ID'}
+      ,{field:'name',  title: '友链名称',templet: '#name'}
+      ,{field:'url',  title: '友链网址',templet:'#url'}
+      ,{field:'logo',  title: 'Logo',templet:'#Friend_logo'}
+      ,{field:'add_time',  title: '添加时间'}
+      ,{fixed:'right', title:'操作', toolbar: '#barDemo'}
+    ]]
+  });
+ 
+  //监听行工具事件
+  table.on('tool(test)',function(obj){
+    var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'del'){
+      layer.confirm('您确定要删除行么？', function(index){
+
+        $.ajax({
+            url: "{:url('Friend/delete')}",
+            data: {id:data.id},
+            dataType:"json",
+          }).done(function( msg ) {
+              if (msg.code==0) {
+                  layer.msg(msg.msg);
+                  // obj.del();
+                  // 页面更新
+                  window.location.reload();
+                  layer.close(index);
+              }else{
+                 layer.msg(msg.msg);
+              }
+          });
+
+      });
+    } else if(obj.event === 'edit'){
+      var Friend_id= data.id;
+      location.href = "{:url('Friend/edit')}?id="+Friend_id;
+    }
+  });
+
+});
+});
+</script>

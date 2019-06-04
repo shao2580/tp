@@ -1,0 +1,154 @@
+<link rel="stylesheet"  href="/static/page.css">
+<div>
+  <span class="layui-breadcrumb">
+    <a href="{:url('Admin/index')}">管理员-管理</a>
+    <a><cite>列表</cite></a>
+  </span>
+
+  <div style="float:right">      
+     <a href="{:url('Admin/add')}"><button class="layui-btn">添加</button></a>      
+     <a href="{:url('Admin/index')}"><button class="layui-btn layui-btn-danger" href="/admin/index">返回</button></a>  
+  </div>
+ <hr/>
+</div> 
+
+<!-- -------------------搜索----------------------------- -->
+<form id="searchform" action="{:url('Admin/index')}">
+
+   <div class="layui-form">
+    <div class="layui-form-item">  
+      <div class="layui-input-inline"> 
+        <select name="field">
+          <option value="admin_name" {if condition ="isset($_GET['field']) && ($_GET['field'] eq 'admin_name') "}selected=""{/if}>管理员名称</option> 
+          <option value="email" {if condition ="isset($_GET['field']) && ($_GET['field'] eq 'email') "}selected=""{/if}>邮箱</option>
+        </select>
+      </div>
+      <div class="layui-input-inline">
+          <input type="text" name="keywords" value="{$_GET['keywords']??''}" autocomplete="off" placeholder="请输入关键字" class="layui-input"><span></span>
+      </div>
+      <input type="button" class="layui-btn layui-btn-primary" value="搜 索">
+    </div> 
+  </div>
+</form>
+
+<!-- ---------------------------------------------------- -->
+<div class="layui-form" id="content">
+  <table class="layui-table">
+    <input type="button" class="delbtn layui-btn layui-btn-primary" value="批量删除">
+    <thead>
+      <tr>
+        <th><input type="checkbox" name="adminId[]" >ID</th>
+        <th>管理员名称</th>
+        <th>邮箱</th>
+        <th>ip</th>
+        <th>添加时间</th>
+        <th>最后登录时间</th> 
+        <th>操作</th>
+      </tr>          
+    </thead>
+    <tbody>
+      {volist name="$data" id='v'} 
+      <tr>
+        <td><input type="checkbox" class="selectAll" name="adminId[]" value="{$v.admin_id}">{$v.admin_id}</td>
+        <td id="{$v.admin_id}"><span class="name" >{$v.admin_name}</span></td>
+        <td>{$v.email}</td>
+        <td>{$v.ip}</td>
+        <td>{$v.addtime|date='Y-m-d H:i:s'}</td>
+        <td>{$v.lasttime|date='Y-m-d H:i:s'}</td>
+        <td>
+          <a href="{:url('Admin/edit',['id'=>$v.admin_id])}"><button class="layui-btn">编辑</button></a>
+          
+          <a href="javascript:if(confirm('您确定要删除这条记录吗？')) location='{:url('Admin/delete',['id'=>$v.admin_id])}'  "><button class="layui-btn layui-btn-danger" >删除</button></a>
+        </td>
+      </tr>
+      {/volist}
+    </tbody>
+  </table>
+    <div align="center">{$data|raw}</div>
+</div>
+
+
+<script>
+  //搜索
+  layui.use(['form'],function(){
+    var form = layui.form
+  });
+// 全选 普通 
+$(document).on('click','th .layui-form-checkbox',function(){
+      var className = $(this).attr('class');
+      $('td .layui-form-checkbox').each(function(index){
+          $(this).attr('class',className);
+      });
+  });
+// 批量删除 
+$('.delbtn').click(function(){
+      var ids = new Array();
+      $('td .layui-form-checked').each(function(index,val){
+          ids.push($(this).prev().val());
+       });
+      if (confirm('您确定要删除这些记录吗？')) {
+          $.post("{:url('Admin/del')}",{ids:ids },
+            function(data){
+                if (data) {
+                  alert('删除成功');
+                  window.location.reload();
+                }else{
+                  alert('发生未知错误,删除失败');
+                }
+            });
+      }
+});
+
+// 提交
+  $('.layui-btn-primary').click(function(){
+    var keywords = $('input[name="keywords"]').val();
+    if (keywords) {
+        $('#searchform').submit();
+    }
+  });
+
+  // 无刷新分页
+  $(document).on('click','.pagination a',function(){
+      var url = $(this).attr('href');
+      if (url) {
+        $.ajax({
+          url:url,
+          cache:false     
+        }).done(function(html){
+          $('#content').html(html);
+        });
+      }
+
+      return false;
+  });
+  
+  // 即点即改
+  $(document).on('click','.name',function(){
+      var name = $(this).text();
+      // alert(name);
+      $(this).parent().html('<input class="ajaxupd" type="text" value="'+name+'">');
+  });
+
+  $(document).on('blur','.ajaxupd',function(){
+    // 获得input值
+    var admin_name = $(this).val();
+    // 获得id
+    var admin_id = $(this).parent().attr('id');
+        // alert(admin_id);die;
+      var obj = $(this);
+
+    if (admin_name && admin_id) {
+        $.ajax({
+            url: "{:url('Admin/ajaxupd')}",
+            data:{admin_name:admin_name,admin_id:admin_id},
+            cache: false
+          }).done(function( msg ) {
+             
+               obj.parent().html('<span class="ajaxupd" >'+admin_name+'</span>');
+              
+          });
+
+    }
+  });
+  
+</script>

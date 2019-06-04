@@ -1,0 +1,114 @@
+<div >
+  <span class="layui-breadcrumb">
+  <a href="{:url('News/index')}">新闻管理管理</a>
+  <a><cite>添加</cite></a>
+</span>
+
+	<div style="float:right">
+	   <a href="{:url('News/index')}"><button class="layui-btn">列表</button></a>
+	   <a href="{:url('News/index')}"><button class="layui-btn layui-btn-danger" href="/Friend/index">返回</button></a>
+	</div>
+</div>
+
+<form class="layui-form"  method="post">
+	<div class="layui-form-item">
+    <label  class="layui-form-label">新闻名称:</label>
+    <div class="layui-input-inline">
+      <input type="text" name="new_name" autocomplete="off" placeholder="请输入新闻名称" class="layui-input"><span></span>
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">新闻内容:</label>
+      <div class="layui-input-inline">
+       <textarea name="content" rows="8" cols="30" placeholder="请输入新闻内容"></textarea>
+      </div> 
+  </div>
+   <div class="layui-form-item">
+        <label class="layui-form-label">新闻图片:</label>
+       <div class="layui-upload">
+        <input type="hidden" id="img" name="new_img" value="" />
+          <button type="button" class="layui-btn icon" id="test1">点击上传图片</button>
+          <div class="layui-upload-list">
+            <img class="layui-upload-img" id="demo1">
+            <p id="demoText"></p>
+        </div>
+    </div>  
+  </div>  
+   <div class="layui-form-item">
+    <label class="layui-form-label">上传时间：</label>
+    <div class="layui-input-block">
+      <input type="radio" name="r_time" value='1' lay-filter='test' title="立即上传" checked="">
+      <input type="radio" name="r_time" value='2' lay-filter='test' title="定时上传"> 
+      <div id="release_time" >
+      		
+      </div>
+  	</div>
+   
+  </div>
+  
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+    	<button class="layui-btn"  lay-submit lay-filter="*" >立即提交</button>
+      <!-- <input type="button"  class="layui-btn submitbtn" lay-submit lay-filter="*" value="立即提交"> -->
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+  </div>
+</form>
+<script type="text/javascript">
+	$(function(){
+		layui.use(['form','upload'],function(){
+		 var $ = layui.jquery
+		,form = layui.form
+		,upload =  layui.upload; 
+		 //普通图片上传
+  var uploadInst = upload.render({
+    elem: '#test1'
+    ,url: "{:url('News/imgUp')}"
+    ,before: function(obj){
+      //预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#demo1').attr('src', result); //图片链接（base64）
+      });
+    }
+    ,done: function(res){
+      //如果上传失败
+      if(res.code > 0){
+        return layer.msg('上传失败');
+      }
+      //上传成功
+      
+      $('#img').val(res.data.src);
+      layer.msg('上传成功');
+    }
+   
+  });
+	
+
+   //监听单选
+  form.on('radio(test)', function(data){
+  var _val = data.value; //被点击的radio的value值
+  var _this = $(this);
+  if (_val==1) {
+  	$('#release_time').empty();
+  }else{
+  	$('#release_time').empty();
+  	$('#release_time').append("<input type='text' name='release_time'>");
+
+  }
+}); 
+
+	 form.on('submit(*)', function(data){
+   		$.post(
+   				"{:url('News/newadd')}",
+   				data.field,
+   				function(res){
+   					layer.msg(res,font,{icon:res.code});
+   				},
+   				'json'
+   			)
+      // return false;
+    });
+  })
+	})
+	
+</script>

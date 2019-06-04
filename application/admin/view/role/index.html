@@ -1,0 +1,107 @@
+<link rel="stylesheet"  href="/static/page.css">
+<div>
+  <span class="layui-breadcrumb">
+    <a href="{:url('Role/index')}">角色-管理</a>
+    <a><cite>列表</cite></a>
+  </span>
+
+  <div style="float:right">      
+     <a href="{:url('Role/add')}"><button class="layui-btn">添加</button></a>      
+     <a href="{:url('Role/index')}"><button class="layui-btn layui-btn-danger" href="/admin/index">返回</button></a>  
+  </div>
+ <hr/>
+</div> 
+<!-- -------------------搜索----------------------------- -->
+<form id="searchform" action="{:url('Role/index')}">
+   <div class="layui-form">
+    <div class="layui-form-item">   
+      
+      <div class="layui-input-inline">
+          <input type="text" name="keyword" value="{$_GET['keyword']??''}" autocomplete="off" placeholder="请输入关键字" class="layui-input"><span></span>
+      </div>
+      <input type="button" class="layui-btn layui-btn-primary" value="搜 索">
+    </div> 
+  </div>
+</form>
+
+
+<!-- ---------------------------------------------------- -->
+<div class="">
+  <table class="layui-table">
+   <input type="button" class="delbtn layui-btn layui-btn-primary" value="批量删除">
+    <thead>
+      <tr>
+        <th width="60"><input class="selectAll" type="checkbox" name="ids[]" >全|反<input class="selectnotAll" type="checkbox" name="ids[]" ></th>
+        <th>ID</th>
+        <th>角色名</th>
+        <th>角色描述</th>
+        <th>操作</th>
+        
+      </tr>          
+    </thead>
+    <tbody>
+      {volist name="$data" id='v'} 
+      <tr>
+        <td><input type="checkbox" name="ids[]" value="{$v.role_id}"></td>
+        <td>{$v.role_id}</td>
+        <td>{$v.role_name}</td>
+        <td>{$v.role_ribe}</td>
+        <td>
+          <a href="{:url('Role/edit',['id'=>$v.role_id])}"><button class="layui-btn">编辑</button></a>
+          
+          <a href="javascript:if(confirm('您确定要删除这条记录吗？')) location='{:url('Role/delete',['id'=>$v.role_id])}'  "><button class="layui-btn layui-btn-danger" >删除</button></a>
+        </td>
+      </tr>
+      {/volist}
+    </tbody>
+  </table>
+    <div align="center">{$data|raw}</div>
+</div>
+
+<script src="/static/layui/layui.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+/*****************全选 批删************************/
+ //全选
+  $('.selectAll').click(function(){
+      $("td input[type='checkbox']").prop({
+          checked:true
+      });
+  });
+  // 反选
+  $('.selectnotAll').click(function(){
+      $("td input[type='checkbox']").prop("checked",function(i,val){
+        return !val;
+     });           
+  });
+  // 批量删除 
+$('.delbtn').click(function(){
+      var ids = new Array();
+      $('td .layui-form-checked').each(function(index,val){
+          ids.push($(this).prev().val());
+       });
+      if (confirm('您确定要删除这些记录吗？')) {
+          $.post("{:url('Role/del')}",{ids:ids },
+            function(data){
+                if (data) {
+                  alert('删除成功');
+                  window.location.reload();
+                }else{
+                  alert('发生未知错误,删除失败');
+                }
+            });
+      }
+});
+/**************************************/
+  layui.use(['form'],function(){
+    var form = layui.form
+  });
+
+  $('.layui-btn-primary').click(function(){
+    var keywords = $('input[name="keyword"]').val();
+
+    if (keywords) {
+        $('#searchform').submit();
+    }
+  });
+</script>

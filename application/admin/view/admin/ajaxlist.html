@@ -1,0 +1,39 @@
+
+{__NOLAYOUT__}
+<!-- ---------------------------------------------------- -->
+
+  <table class="layui-table">
+    <input type="button" class="delbtn layui-btn layui-btn-primary" value="批量删除">
+    <thead>
+      <tr>
+        <th><input type="checkbox" name="adminId[]" >ID</th>
+        <th>管理员名称</th>
+        <th>邮箱</th>
+        <th>ip</th>
+        <th>添加时间</th>
+        <th>最后登录时间</th> 
+        <th>操作</th>
+      </tr>          
+    </thead>
+    <tbody>
+      {volist name="$data" id='v'} 
+      <tr>
+        <td><input type="checkbox" class="selectAll" name="adminId[]" value="{$v.admin_id}">{$v.admin_id}</td>
+        <td id="{$v.admin_id}"><span class="name" >{$v.admin_name}</span></td>
+        <td>{$v.email}</td>
+        <td>{$v.ip}</td>
+        <td>{$v.addtime|date='Y-m-d H:i:s'}</td>
+        <td>{$v.lasttime|date='Y-m-d H:i:s'}</td>
+        <td>
+          <a href="{:url('Admin/edit',['id'=>$v.admin_id])}"><button class="layui-btn">编辑</button></a>
+          
+          <a href="javascript:if(confirm('您确定要删除这条记录吗？')) location='{:url('Admin/delete',['id'=>$v.admin_id])}'  "><button class="layui-btn layui-btn-danger" >删除</button></a>
+        </td>
+      </tr>
+      {/volist}
+    </tbody>
+  </table>
+    <div align="center">{$data|raw}</div>
+
+
+
